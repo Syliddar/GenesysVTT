@@ -1,14 +1,22 @@
 ﻿namespace GenesysVTT
 {
+    public enum DiceType
+    {
+        Boost,
+        Setback,
+        Ability,
+        Difficulty,
+        Proficiency,
+        Challenge
+    }
     public class Dice
     {
-        public string Name { get; set; }
+        public DiceType Type { get; set; }
         public List<Face> Faces { get; set; }
         private readonly Random rnd;
 
         public Dice()
         {
-            Name = "";
             Faces = new List<Face> { new Face() };
             rnd = new Random();
         }
@@ -29,6 +37,10 @@
     }
     public class Result
     {
+        public Result()
+        {
+
+        }
         public Result(List<Dice> dicePool)
         {
             foreach (var dice in dicePool)
@@ -74,7 +86,7 @@
     {
         public Boost()
         {
-            Name = "Boost";
+            Type = DiceType.Boost;
             Faces = new List<Face>
             {
                 new Face() {},
@@ -90,7 +102,7 @@
     {
         public Setback()
         {
-            Name = "Setback";
+            Type = DiceType.Setback;
             Faces = new List<Face>
             {
                 new Face() {},
@@ -106,7 +118,7 @@
     {
         public Ability()
         {
-            Name = "Ability";
+            Type = DiceType.Ability;
             Faces = new List<Face>
             {
                 new Face() {},
@@ -124,7 +136,7 @@
     {
         public Difficulty()
         {
-            Name = "Difficulty";
+            Type = DiceType.Difficulty;
             Faces = new List<Face>
             {
                 new Face() {},
@@ -142,7 +154,7 @@
     {
         public Proficiency()
         {
-            Name = "Difficulty";
+            Type = DiceType.Proficiency;
             Faces = new List<Face>
             {
                 new Face() {},
@@ -164,7 +176,7 @@
     {
         public Challenge()
         {
-            Name = "Difficulty";
+            Type = DiceType.Challenge;
             Faces = new List<Face>
             {
                 new Face() {},
