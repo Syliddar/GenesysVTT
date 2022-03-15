@@ -1,18 +1,110 @@
 ﻿@using GenesysVTT.Data
+<div class="row">
+    <div class="col-8">
+        <div class="row">
+            <div class="col-12">
+                <h1>Current Pool: @currentPoolString</h1>
+            </div>
+            <div class="col-3 border border-dark  p-2 m-2">
+                <div class="row text-center mx-auto my-auto">
+                    <div class="col-4">
+                        <button class="btn btn-primary col-12" @onclick="AddProficiency">+</button>
+                        <button class="btn btn-primary col-12 mt-1" @onclick="RemoveProficiency">-</button>
+                    </div>
+                    <div class="col-4 mt-3">
+                        <h1>@DicePool.Where(d=>d.Type == DiceType.Proficiency).Count()</h1>
+                    </div>
+                    <div class="col-4 mt-3">
+                        <h1 class="genesys dice proficiency">l</h1>
+                    </div>
+                </div>
+            </div>
 
-<h1>Die Roller</h1>
+            <div class="col-3 border border-dark  p-2 m-2">
+                <div class="row text-center mx-auto my-auto">
+                    <div class="col-4">
+                        <button class="btn btn-primary col-12" @onclick="AddAbility">+</button>
+                        <button class="btn btn-primary col-12 mt-1" @onclick="RemoveAbility">-</button>
+                    </div>
+                    <div class="col-4 mt-3">
+                        <h1>@DicePool.Where(d=>d.Type == DiceType.Ability).Count()</h1>
+                    </div>
+                    <div class="col-4 mt-3">
+                        <h1 class="genesys dice ability">k</h1>
+                    </div>
+                </div>
+            </div>
 
-<p>Current Pool: @currentPoolString</p>
-<p>@result.ToString()</p>
-<button class="btn btn-primary" @onclick="AddBoost">Add Boost</button>
-<button class="btn btn-primary" @onclick="AddSetback">Add Setback</button>
-<button class="btn btn-primary" @onclick="AddAbility">Add Ability</button>
-<button class="btn btn-primary" @onclick="AddDifficulty">Add Difficulty</button>
-<button class="btn btn-primary" @onclick="AddProficiency">Add Proficiency</button>
-<button class="btn btn-primary" @onclick="AddChallenge">Add Challenge</button>
-<br />
-<button class="btn btn-primary" @onclick="RollDice">Roll Dice</button>
+            <div class="col-3 border border-dark  p-2 m-2">
+                <div class="row text-center mx-auto my-auto">
+                    <div class="col-4">
+                        <button class="btn btn-primary col-12" @onclick="AddBoost">+</button>
+                        <button class="btn btn-primary col-12 mt-1" @onclick="RemoveBoost">-</button>
+                    </div>
+                    <div class="col-4 mt-3">
+                        <h1>@DicePool.Where(d=>d.Type == DiceType.Boost).Count()</h1>
+                    </div>
+                    <div class="col-4 mt-3">
+                        <h1 class="genesys dice boost">j</h1>
+                    </div>
+                </div>
+            </div>
 
+
+            <div class="col-3 border border-dark  p-2 m-2">
+                <div class="row text-center mx-auto my-auto">
+                    <div class="col-4">
+                        <button class="btn btn-primary col-12" @onclick="AddChallenge">+</button>
+                        <button class="btn btn-primary col-12 mt-1" @onclick="RemoveChallenge">-</button>
+                    </div>
+                    <div class="col-4 mt-3">
+                        <h1>@DicePool.Where(d=>d.Type == DiceType.Challenge).Count()</h1>
+                    </div>
+                    <div class="col-4 mt-3">
+                        <h1 class="genesys dice challenge">l</h1>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-3 border border-dark  p-2 m-2">
+                <div class="row text-center mx-auto my-auto">
+                    <div class="col-4">
+                        <button class="btn btn-primary col-12" @onclick="AddDifficulty">+</button>
+                        <button class="btn btn-primary col-12 mt-1" @onclick="RemoveDifficulty">-</button>
+                    </div>
+                    <div class="col-4 mt-3">
+                        <h1>@DicePool.Where(d=>d.Type == DiceType.Difficulty).Count()</h1>
+                    </div>
+                    <div class="col-4 mt-3">
+                        <h1 class="genesys dice difficulty">k</h1>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-3 border border-dark  p-2 m-2">
+                <div class="row text-center mx-auto my-auto">
+                    <div class="col-4">
+                        <button class="btn btn-primary col-12" @onclick="AddSetback">+</button>
+                        <button class="btn btn-primary col-12 mt-1" @onclick="RemoveSetback">-</button>
+                    </div>
+                    <div class="col-4 mt-3">
+                        <h1>@DicePool.Where(d=>d.Type == DiceType.Setback).Count()</h1>
+                    </div>
+                    <div class="col-4 mt-3">
+                        <h1 class="genesys dice setback">j</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <h1 area-label="@result.ToString()" class="genesys">@result.ToDiceResultString()</h1>
+
+        <div class="col-12">
+            <button class="btn btn-primary" @onclick="RollDice">Roll!</button>
+        </div>
+    </div>
+</div>
 @code {
     private List<Dice> DicePool = new List<Dice>();
     private Result result = new Result();
@@ -27,9 +119,21 @@
         DicePool.Add(new Boost());
         UpdateDicePoolDisplay();
     }
+    private void RemoveBoost()
+    {
+        if (DicePool.Any(d => d.Type == DiceType.Boost))
+            DicePool.Remove(DicePool.Last(x => x.Type == DiceType.Boost));
+        UpdateDicePoolDisplay();
+    }
     private void AddSetback()
     {
         DicePool.Add(new Setback());
+        UpdateDicePoolDisplay();
+    }
+    private void RemoveSetback()
+    {
+        if (DicePool.Any(d => d.Type == DiceType.Setback))
+            DicePool.Remove(DicePool.Last(x => x.Type == DiceType.Setback));
         UpdateDicePoolDisplay();
     }
     private void AddAbility()
@@ -37,9 +141,21 @@
         DicePool.Add(new Ability());
         UpdateDicePoolDisplay();
     }
+    private void RemoveAbility()
+    {
+        if (DicePool.Any(d => d.Type == DiceType.Ability))
+            DicePool.Remove(DicePool.Last(x => x.Type == DiceType.Ability));
+        UpdateDicePoolDisplay();
+    }
     private void AddDifficulty()
     {
         DicePool.Add(new Difficulty());
+        UpdateDicePoolDisplay();
+    }
+    private void RemoveDifficulty()
+    {
+        if (DicePool.Any(d => d.Type == DiceType.Difficulty))
+            DicePool.Remove(DicePool.Last(x => x.Type == DiceType.Difficulty));
         UpdateDicePoolDisplay();
     }
     private void AddProficiency()
@@ -47,19 +163,34 @@
         DicePool.Add(new Proficiency());
         UpdateDicePoolDisplay();
     }
+    private void RemoveProficiency()
+    {
+        if (DicePool.Any(d => d.Type == DiceType.Proficiency))
+            DicePool.Remove(DicePool.Last(x => x.Type == DiceType.Proficiency));
+        UpdateDicePoolDisplay();
+    }
     private void AddChallenge()
     {
         DicePool.Add(new Challenge());
         UpdateDicePoolDisplay();
     }
+    private void RemoveChallenge()
+    {
+        if (DicePool.Any(d => d.Type == DiceType.Challenge))
+            DicePool.Remove(DicePool.Last(x => x.Type == DiceType.Challenge));
+        UpdateDicePoolDisplay();
+    }
     private void UpdateDicePoolDisplay()
     {
         currentPoolString = "";
-        if (DicePool.Any(x => x.Type == DiceType.Boost)) { currentPoolString += $"{DicePool.Count(x=>x.Type==DiceType.Boost)} Boost  "; }
-        if (DicePool.Any(x => x.Type == DiceType.Setback)) { currentPoolString += $"{DicePool.Count(x=>x.Type==DiceType.Setback)} Setback  "; }
-        if (DicePool.Any(x => x.Type == DiceType.Ability)) { currentPoolString += $"{DicePool.Count(x=>x.Type==DiceType.Ability)} Ability  "; }
-        if (DicePool.Any(x => x.Type == DiceType.Difficulty)) { currentPoolString += $"{DicePool.Count(x=>x.Type==DiceType.Difficulty)} Difficulty  "; }
-        if (DicePool.Any(x => x.Type == DiceType.Proficiency)) { currentPoolString += $"{DicePool.Count(x=>x.Type==DiceType.Proficiency)} Proficiency  "; }
-        if (DicePool.Any(x => x.Type == DiceType.Challenge)) { currentPoolString += $"{DicePool.Count(x=>x.Type==DiceType.Challenge)} Challenge  "; }
+        if (DicePool.Any(x => x.Type == DiceType.Boost)) { currentPoolString += $"{DicePool.Count(x => x.Type == DiceType.Boost)} Boost  "; }
+        if (DicePool.Any(x => x.Type == DiceType.Setback)) { currentPoolString += $"{DicePool.Count(x => x.Type == DiceType.Setback)} Setback  "; }
+        if (DicePool.Any(x => x.Type == DiceType.Ability)) { currentPoolString += $"{DicePool.Count(x => x.Type == DiceType.Ability)} Ability  "; }
+        if (DicePool.Any(x => x.Type == DiceType.Difficulty)) { currentPoolString += $"{DicePool.Count(x => x.Type == DiceType.Difficulty)} Difficulty  "; }
+        if (DicePool.Any(x => x.Type == DiceType.Proficiency))
+        {
+            currentPoolString += $"{DicePool.Count(x => x.Type == DiceType.Proficiency)} Proficiency  ";
+        }
+        if (DicePool.Any(x => x.Type == DiceType.Challenge)) { currentPoolString += $"{DicePool.Count(x => x.Type == DiceType.Challenge)} Challenge  "; }
     }
-}
+    }

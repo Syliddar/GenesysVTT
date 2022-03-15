@@ -73,6 +73,49 @@
             if (Despair > 0) { result += $" || {Despair} Despair"; }
             return result;
         }
+        public string ToDiceResultString()
+        {
+
+            string result = "";
+            if (NetSuccessFail > 0)
+            {
+                for (int i = 0; i < NetSuccessFail; i++)
+                {
+                    result += "s";
+                }
+            }            
+            if (NetSuccessFail < 0) {
+                for (int i = 0; i < NetSuccessFail; i++)
+                {
+                    result += "f";
+                }
+            }
+
+            if (NetAdvantageThreat > 0)
+            {
+                for (int i = 0; i < NetAdvantageThreat; i++)
+                {
+                    result += "a";
+                } 
+            }
+            if (NetAdvantageThreat < 0) {
+
+                for (int i = 0; i < NetAdvantageThreat; i++)
+                {
+                    result += "h";
+                }
+            }
+            for (int i = 0; i < Triumph; i++)
+            {
+                result += "t";
+            }
+
+            for (int i = 0; i < Despair; i++)
+            {
+                result += "d";
+            }
+            return result;
+        }
         public int NetSuccessFail { get; set; }
         public int NetAdvantageThreat { get; set; }
         public int Success { get; set; }
