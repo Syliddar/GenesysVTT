@@ -9,8 +9,9 @@
         Proficiency,
         Challenge
     }
-    public class Dice
+    public abstract class Dice
     {
+        public abstract string ToSymbolString();
         public DiceType Type { get; set; }
         public List<Face> Faces { get; set; }
         private readonly Random rnd;
@@ -140,6 +141,10 @@
                 new Face() {Advantage=1}
             };
         }
+        public override string ToSymbolString()
+        {
+            return "<span class=\"genesys dice boost\">j</span>";
+        }
     }
     public class Setback : Dice
     {
@@ -155,6 +160,11 @@
                 new Face() {Threat=1},
                 new Face() {Threat=1}
             };
+        }
+
+        public override string ToSymbolString()
+        {
+            return "<span class=\"genesys dice setback\">j</span>";
         }
     }
     public class Ability : Dice
@@ -174,6 +184,11 @@
                 new Face() {Advantage=2}
             };
         }
+
+        public override string ToSymbolString()
+        {
+            return "<span class=\"genesys dice ability\">k</span>";
+        }
     }
     public class Difficulty : Dice
     {
@@ -191,6 +206,11 @@
                 new Face() {Threat=2},
                 new Face() {Failure=1, Threat=1}
             };
+        }
+
+        public override string ToSymbolString()
+        {
+            return "<span class=\"genesys dice difficulty\">k</span>";
         }
     }
     public class Proficiency : Dice
@@ -214,6 +234,11 @@
                 new Face() {Triumph=1}
             };
         }
+
+        public override string ToSymbolString()
+        {
+            return "<span class=\"genesys dice proficiency\">l</span>";
+        }
     }
     public class Challenge : Dice
     {
@@ -235,6 +260,11 @@
                 new Face() {Threat = 2 },
                 new Face() {Despair=1}
             };
+        }
+
+        public override string ToSymbolString()
+        {
+            return "<span class=\"genesys dice challenge\">l</span>";
         }
     }
     
