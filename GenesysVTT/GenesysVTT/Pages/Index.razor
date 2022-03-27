@@ -1,18 +1,39 @@
 ﻿@page "/"
 
+@using GenesysVTT.Data
+@using GenesysVTT.Services
+
+@inject MessageLogService _log
+
 <PageTitle>Index</PageTitle>
 <div class=container>
     <div class="row">
         <div class="col-8">
-            <DiceRoller/>
+            <DiceRoller />
         </div>
     </div>
     <div class="row">
         <div class="col-12">
-            <h1 class="genesys"></h1>
+            @if (log == null)
+            {
+                <p>Loading.....</p>
+            }
+            else
+            {
+                @foreach (var msg in log)
+                {
+                    <p>@msg.Message</p>
+                }
+            }
         </div>
     </div>
 </div>
 
 @code {
+    private List<MessageLog> log { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        log = await _log.GetMessagesAsync();
+    }
 }

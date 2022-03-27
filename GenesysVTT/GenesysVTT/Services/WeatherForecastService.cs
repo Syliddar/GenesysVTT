@@ -1,4 +1,6 @@
-namespace GenesysVTT.Data
+using GenesysVTT.Data;
+
+namespace GenesysVTT.Services
 {
     public class WeatherForecastService
     {
