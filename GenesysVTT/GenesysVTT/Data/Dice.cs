@@ -1,4 +1,7 @@
-﻿namespace GenesysVTT
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace GenesysVTT
 {
     public enum DiceType
     {
@@ -38,21 +41,21 @@
     }
     public class Result
     {
-        public Result()
+        public Result(List<Dice> dicePool, string character = "")
         {
-
-        }
-        public Result(List<Dice> dicePool)
-        {
+            Character = character;
+            Pool = dicePool;
+            PoolString = "";
             foreach (var dice in dicePool)
             {
-                var face = dice.Roll();
-                Success += face.Success;
-                Failures += face.Failure;
-                Advantage += face.Advantage;
-                Threat += face.Threat;
-                Triumph += face.Triumph;
-                Despair += face.Despair;
+                PoolString += dice.Type.ToString() + "|";
+                var resultFace = dice.Roll();
+                Success += resultFace.Success;
+                Failures += resultFace.Failure;
+                Advantage += resultFace.Advantage;
+                Threat += resultFace.Threat;
+                Triumph += resultFace.Triumph;
+                Despair += resultFace.Despair;
             }
             Success += Triumph;
             Failures += Despair;
@@ -76,7 +79,6 @@
         }
         public string ToDiceResultString()
         {
-
             string result = "";
             if (NetSuccessFail > 0)
             {
@@ -84,8 +86,9 @@
                 {
                     result += "s";
                 }
-            }            
-            if (NetSuccessFail < 0) {
+            }
+            if (NetSuccessFail < 0)
+            {
                 for (int i = 0; i < NetSuccessFail; i++)
                 {
                     result += "f";
@@ -97,9 +100,10 @@
                 for (int i = 0; i < NetAdvantageThreat; i++)
                 {
                     result += "a";
-                } 
+                }
             }
-            if (NetAdvantageThreat < 0) {
+            if (NetAdvantageThreat < 0)
+            {
 
                 for (int i = 0; i < NetAdvantageThreat; i++)
                 {
@@ -117,6 +121,9 @@
             }
             return result;
         }
+        public IEnumerable<Dice> Pool { get; set; }
+        public string Character { get; set; }
+        public string PoolString { get; set; }
         public int NetSuccessFail { get; set; }
         public int NetAdvantageThreat { get; set; }
         public int Success { get; set; }
@@ -267,5 +274,5 @@
             return "<span class=\"genesys dice challenge\">l</span>";
         }
     }
-    
+
 }

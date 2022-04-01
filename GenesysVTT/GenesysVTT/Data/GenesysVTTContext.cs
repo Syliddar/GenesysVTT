@@ -5,7 +5,7 @@ namespace GenesysVTT.Data
 {
     public class GenesysVTTContext : DbContext
     {
-        public DbSet<MessageLog> MessageLogs { get; set; }
+        public DbSet<Message> MessageLogs { get; set; }
 
         public GenesysVTTContext(DbContextOptions<GenesysVTTContext> options) : base(options)
         { }

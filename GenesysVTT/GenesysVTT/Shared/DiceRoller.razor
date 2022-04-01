@@ -1,31 +1,39 @@
 ﻿@using GenesysVTT.Data
+@using GenesysVTT.Services
+@using Microsoft.AspNetCore.SignalR.Client
+
+@inject ChatHub _chatHub
+@inject NavigationManager navigationManager
 
 <div class="row">
     <div class="col-12">
-        <h1>Current Pool: @foreach (var die in DicePool)
-    {
-        switch (die.Type)
-        {
-            case DiceType.Proficiency:
-                <span class="genesys dice proficiency">l</span>
-                break;
-            case DiceType.Ability:
-                <span class="genesys dice ability">k</span>
-                break;
-            case DiceType.Boost:
-                <span class="genesys dice boost">j</span>
-                break;
-            case DiceType.Challenge:
-                <span class="genesys dice challenge">l</span>
-                break;
-            case DiceType.Difficulty:
-                <span class="genesys dice difficulty">k</span>
-                break;
-            case DiceType.Setback:
-                <span class="genesys dice setback">j</span>
-                break;
-        }
-    }</h1>
+        <h1>
+            Current Pool: @foreach (var x in currentPoolString)
+            {
+                switch (x)
+                {
+                    case 'p':
+                        <span class="genesys dice proficiency">l</span>
+                        break;
+                    case 'a':
+                        <span class="genesys dice ability">k</span>
+                        break;
+                    case 'b':
+                        <span class="genesys dice boost">j</span>
+                        break;
+                    case 'c':
+                        <span class="genesys dice challenge">l</span>
+                        break;
+                    case 'd':
+                        <span class="genesys dice difficulty">k</span>
+                        break;
+                    case 's':
+                        <span class="genesys dice setback">j</span>
+                        break;
+                }
+
+            }
+        </h1>
     </div>
     <div class="col-3 border border-dark  p-2 m-2">
         <div class="row text-center mx-auto my-auto">
@@ -41,7 +49,6 @@
             </div>
         </div>
     </div>
-
     <div class="col-3 border border-dark  p-2 m-2">
         <div class="row text-center mx-auto my-auto">
             <div class="col-4">
@@ -114,103 +121,161 @@
     </div>
 </div>
 
-<h1 area-label="@result.ToString()" class="genesys">@result.ToDiceResultString()</h1>
 <div class="col-12">
     <button class="btn btn-primary" @onclick="RollDice">Roll!</button>
+    <button class="btn btn-info" @onclick="RollDice">Reset</button>
 </div>
 @code {
+    [CascadingParameter(Name = "UserName")]
+    public string _username { get; set; } = "";
+
     private string currentPoolSymbolString = "";
     private List<Dice> DicePool = new List<Dice>();
-    private Result result = new Result();
+    private Result? result;
+    private HubConnection _hubConnection;
+    private string _hubUrl = "";
     private string currentPoolString = "";
 
-    private void RollDice()
+    private async void RollDice()
     {
         result = new Result(DicePool);
+        await _hubConnection.SendAsync("Broadcast", _username, $"[Dice]{currentPoolString}|{result.ToDiceResultString()}");
+        StateHasChanged();
     }
+
+    private void Reset()
+    {
+        DicePool = new List<Dice>();
+        currentPoolSymbolString = "";
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        string baseUrl = navigationManager.BaseUri;
+
+        _hubUrl = baseUrl.TrimEnd('/') + ChatHub.HubUrl;
+
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(_hubUrl)
+            .Build();
+        await _hubConnection.StartAsync();
+    }
+
+
+
+    #region DiceMethods
     private void AddBoost()
     {
         DicePool.Add(new Boost());
-        UpdateDicePoolDisplay();
+        UpdateDicePoolString();
     }
     private void RemoveBoost()
     {
         if (DicePool.Any(d => d.Type == DiceType.Boost))
             DicePool.Remove(DicePool.Last(x => x.Type == DiceType.Boost));
-        UpdateDicePoolDisplay();
+        UpdateDicePoolString();
     }
     private void AddSetback()
     {
         DicePool.Add(new Setback());
-        UpdateDicePoolDisplay();
+        UpdateDicePoolString();
     }
     private void RemoveSetback()
     {
         if (DicePool.Any(d => d.Type == DiceType.Setback))
             DicePool.Remove(DicePool.Last(x => x.Type == DiceType.Setback));
-        UpdateDicePoolDisplay();
+        UpdateDicePoolString();
     }
     private void AddAbility()
     {
         DicePool.Add(new Ability());
-        UpdateDicePoolDisplay();
+        UpdateDicePoolString();
     }
     private void RemoveAbility()
     {
         if (DicePool.Any(d => d.Type == DiceType.Ability))
             DicePool.Remove(DicePool.Last(x => x.Type == DiceType.Ability));
-        UpdateDicePoolDisplay();
+        UpdateDicePoolString();
     }
     private void AddDifficulty()
     {
         DicePool.Add(new Difficulty());
-        UpdateDicePoolDisplay();
+        UpdateDicePoolString();
     }
     private void RemoveDifficulty()
     {
         if (DicePool.Any(d => d.Type == DiceType.Difficulty))
             DicePool.Remove(DicePool.Last(x => x.Type == DiceType.Difficulty));
-        UpdateDicePoolDisplay();
+        UpdateDicePoolString();
     }
     private void AddProficiency()
     {
         DicePool.Add(new Proficiency());
-        UpdateDicePoolDisplay();
+        UpdateDicePoolString();
     }
     private void RemoveProficiency()
     {
         if (DicePool.Any(d => d.Type == DiceType.Proficiency))
             DicePool.Remove(DicePool.Last(x => x.Type == DiceType.Proficiency));
-        UpdateDicePoolDisplay();
+        UpdateDicePoolString();
     }
     private void AddChallenge()
     {
         DicePool.Add(new Challenge());
-        UpdateDicePoolDisplay();
+        UpdateDicePoolString();
     }
     private void RemoveChallenge()
     {
         if (DicePool.Any(d => d.Type == DiceType.Challenge))
             DicePool.Remove(DicePool.Last(x => x.Type == DiceType.Challenge));
-        UpdateDicePoolDisplay();
+        UpdateDicePoolString();
     }
-    private void UpdateDicePoolDisplay()
+    private void UpdateDicePoolString()
     {
         currentPoolSymbolString = "";
         currentPoolString = "";
-        if (DicePool.Any(x => x.Type == DiceType.Boost)) { currentPoolString += $"{DicePool.Count(x => x.Type == DiceType.Boost)} Boost  "; }
-        if (DicePool.Any(x => x.Type == DiceType.Setback)) { currentPoolString += $"{DicePool.Count(x => x.Type == DiceType.Setback)} Setback  "; }
-        if (DicePool.Any(x => x.Type == DiceType.Ability)) { currentPoolString += $"{DicePool.Count(x => x.Type == DiceType.Ability)} Ability  "; }
-        if (DicePool.Any(x => x.Type == DiceType.Difficulty)) { currentPoolString += $"{DicePool.Count(x => x.Type == DiceType.Difficulty)} Difficulty  "; }
         if (DicePool.Any(x => x.Type == DiceType.Proficiency))
         {
-            currentPoolString += $"{DicePool.Count(x => x.Type == DiceType.Proficiency)} Proficiency  ";
+            for (int x = 0; x < DicePool.Count(x => x.Type == DiceType.Proficiency); x++)
+            {
+                currentPoolString += "p";
+            }
         }
-        if (DicePool.Any(x => x.Type == DiceType.Challenge)) { currentPoolString += $"{DicePool.Count(x => x.Type == DiceType.Challenge)} Challenge  "; }
-
-        foreach (var die in DicePool)
+        if (DicePool.Any(x => x.Type == DiceType.Ability))
         {
-            currentPoolSymbolString += die.ToSymbolString();
+            for (int x = 0; x < DicePool.Count(x => x.Type == DiceType.Ability); x++)
+            {
+                currentPoolString += "a";
+            }
+        }
+        if (DicePool.Any(x => x.Type == DiceType.Boost))
+        {
+            for (int x = 0; x < DicePool.Count(x => x.Type == DiceType.Boost); x++)
+            {
+                currentPoolString += "b";
+            }
+        }
+        if (DicePool.Any(x => x.Type == DiceType.Challenge))
+        {
+            for (int x = 0; x < DicePool.Count(x => x.Type == DiceType.Challenge); x++)
+            {
+                currentPoolString += "c";
+            }
+        }
+        if (DicePool.Any(x => x.Type == DiceType.Difficulty))
+        {
+            for (int x = 0; x < DicePool.Count(x => x.Type == DiceType.Difficulty); x++)
+            {
+                currentPoolString += "d";
+            }
+        }
+        if (DicePool.Any(x => x.Type == DiceType.Setback))
+        {
+            for (int x = 0; x < DicePool.Count(x => x.Type == DiceType.Setback); x++)
+            {
+                currentPoolString += "s";
+            }
         }
     }
+    #endregion
 }

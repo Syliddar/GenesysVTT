@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddTransient<MessageLogService>();
+builder.Services.AddTransient<ChatHub>();
 builder.Services.AddDbContext<GenesysVTTContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("GenesysVTT")));
 
 
@@ -29,7 +29,11 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.MapBlazorHub();
-app.MapFallbackToPage("/_Host");
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapBlazorHub();
+    endpoints.MapFallbackToPage("/_Host");
+    endpoints.MapHub<ChatHub>(ChatHub.HubUrl);
+});
 
 app.Run();
