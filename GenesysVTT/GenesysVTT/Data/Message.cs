@@ -11,22 +11,32 @@ namespace GenesysVTT.Data
             Body = body;
             Mine = mine;
             Timestamp = DateTime.Now;
+
+            try
+            {
+                var resultJson = JsonSerializer.Deserialize<ResultJson>(Body);
+                if (resultJson != null)
+                {
+                    IsDiceResult = true;
+                    Data = new Dictionary<string, string>
+                    {
+                        { "Result", resultJson.Result },
+                        { "Pool", resultJson.Pool }
+                    };
+                }
+            }
+            catch
+            {
+                IsDiceResult = false;
+            }
         }
         public string Username { get; set; }
         public string Body { get; set; }
+        public Dictionary<string, string> Data { get; set; }
         public bool Mine { get; set; }
-        public bool IsNotice => Body.StartsWith("[Notice]");
-        public bool IsDiceResult => Body.StartsWith("[Dice]");
+        public bool IsNotice { get; set; }
+        public bool IsDiceResult { get; set; }
         public string CSS => Mine ? "sent" : "received";
-        public MessageLogType Type { get; set; }
         public DateTime Timestamp { get; set; }
-
-    }
-
-    public enum MessageLogType
-    {
-        DiceResult,
-        StoryPoint,
-        Chat,
     }
 }

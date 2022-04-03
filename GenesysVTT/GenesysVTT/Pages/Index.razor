@@ -46,7 +46,7 @@
                 <br />
                 <div class="row">
                     <div class="col-6" id="scrollbox">
-                        @foreach (var item in _messages.OrderByDescending(x => x.Timestamp))
+                        @foreach (var item in _messages.OrderByDescending(x => x.Timestamp).Take(10))
                         {
                             @if (item.IsNotice)
                             {
@@ -57,9 +57,11 @@
                                 <div class="@item.CSS">
                                     <div class="user">@item.Username</div>
                                     <div class="msg">
-                                        Rolled Dice: <br />
-                                        <span>
-                                            @foreach (var x in @item.Body.Split("[Dice]")[1].Split("|")[0])
+                                        <div class="col-12">
+                                            Rolled Dice:
+                                        </div>
+                                        <span class="col-12">
+                                            @foreach (var x in item.Data["Pool"])
                                             {
                                                 switch (x)
                                                 {
@@ -84,8 +86,10 @@
                                                 }
                                             }
                                         </span>
-                                        Result: <br />
-                                        <span class=genesys>@item.Body.Split("[Dice]")[1].Split("|")[1]</span>
+                                        <div class="col-12">Result:</div>
+                                        <span class="genesys col-12">
+                                            @item.Data["Result"]
+                                        </span>
                                     </div>
                                 </div>
                             }
@@ -165,7 +169,6 @@
             _isChatting = false;
         }
     }
-
     private void BroadcastMessage(string name, string message)
     {
         bool isMine = name.Equals(_username, StringComparison.OrdinalIgnoreCase);

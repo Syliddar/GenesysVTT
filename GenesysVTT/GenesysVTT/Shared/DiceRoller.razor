@@ -1,6 +1,7 @@
 ﻿@using GenesysVTT.Data
 @using GenesysVTT.Services
 @using Microsoft.AspNetCore.SignalR.Client
+@using System.Text.Json
 
 @inject ChatHub _chatHub
 @inject NavigationManager navigationManager
@@ -129,24 +130,26 @@
     [CascadingParameter(Name = "UserName")]
     public string _username { get; set; } = "";
 
-    private string currentPoolSymbolString = "";
-    private List<Dice> DicePool = new List<Dice>();
-    private Result? result;
     private HubConnection _hubConnection;
     private string _hubUrl = "";
+
+    private List<Dice> DicePool = new List<Dice>();
+    private Result? result;
     private string currentPoolString = "";
 
     private async void RollDice()
     {
-        result = new Result(DicePool);
-        await _hubConnection.SendAsync("Broadcast", _username, $"[Dice]{currentPoolString}|{result.ToDiceResultString()}");
-        StateHasChanged();
+        if (DicePool.Any())
+        {
+            result = new Result(DicePool);
+            await _hubConnection.SendAsync("Broadcast", _username, JsonSerializer.Serialize(result.ToResultJson()));
+            StateHasChanged();
+        }
     }
-
     private void Reset()
     {
         DicePool = new List<Dice>();
-        currentPoolSymbolString = "";
+        currentPoolString = "";
     }
 
     protected override async Task OnInitializedAsync()
@@ -232,7 +235,6 @@
     }
     private void UpdateDicePoolString()
     {
-        currentPoolSymbolString = "";
         currentPoolString = "";
         if (DicePool.Any(x => x.Type == DiceType.Proficiency))
         {

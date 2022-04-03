@@ -41,14 +41,13 @@ namespace GenesysVTT
     }
     public class Result
     {
-        public Result(List<Dice> dicePool, string character = "")
+        public Result(List<Dice> dicePool)
         {
-            Character = character;
             Pool = dicePool;
             PoolString = "";
             foreach (var dice in dicePool)
             {
-                PoolString += dice.Type.ToString() + "|";
+                PoolString += dice.ToSymbolString();
                 var resultFace = dice.Roll();
                 Success += resultFace.Success;
                 Failures += resultFace.Failure;
@@ -77,9 +76,9 @@ namespace GenesysVTT
             if (Despair > 0) { result += $" || {Despair} Despair"; }
             return result;
         }
-        public string ToDiceResultString()
+        public ResultJson ToResultJson()
         {
-            string result = "";
+            var result = "";
             if (NetSuccessFail > 0)
             {
                 for (int i = 0; i < NetSuccessFail; i++)
@@ -104,7 +103,6 @@ namespace GenesysVTT
             }
             if (NetAdvantageThreat < 0)
             {
-
                 for (int i = 0; i < NetAdvantageThreat; i++)
                 {
                     result += "h";
@@ -119,10 +117,57 @@ namespace GenesysVTT
             {
                 result += "d";
             }
-            return result;
+
+
+            return new ResultJson
+            {
+                Result = result,
+                Pool = PoolString,
+            };
         }
+        //{
+        //    string result = "";
+        //    if (NetSuccessFail > 0)
+        //    {
+        //        for (int i = 0; i < NetSuccessFail; i++)
+        //        {
+        //            result += "s";
+        //        }
+        //    }
+        //    if (NetSuccessFail < 0)
+        //    {
+        //        for (int i = 0; i < NetSuccessFail; i++)
+        //        {
+        //            result += "f";
+        //        }
+        //    }
+
+        //    if (NetAdvantageThreat > 0)
+        //    {
+        //        for (int i = 0; i < NetAdvantageThreat; i++)
+        //        {
+        //            result += "a";
+        //        }
+        //    }
+        //    if (NetAdvantageThreat < 0)
+        //    {
+
+        //        for (int i = 0; i < NetAdvantageThreat; i++)
+        //        {
+        //            result += "h";
+        //        }
+        //    }
+        //    for (int i = 0; i < Triumph; i++)
+        //    {
+        //        result += "t";
+        //    }
+
+        //    for (int i = 0; i < Despair; i++)
+        //    {
+        //        result += "d";
+        //    }
+        //    return result;
         public IEnumerable<Dice> Pool { get; set; }
-        public string Character { get; set; }
         public string PoolString { get; set; }
         public int NetSuccessFail { get; set; }
         public int NetAdvantageThreat { get; set; }
@@ -132,6 +177,11 @@ namespace GenesysVTT
         public int Threat { get; set; }
         public int Triumph { get; set; }
         public int Despair { get; set; }
+    }
+    public class ResultJson
+    {
+        public string Pool { get; set; }
+        public string Result { get; set; }
     }
     public class Boost : Dice
     {
@@ -150,7 +200,7 @@ namespace GenesysVTT
         }
         public override string ToSymbolString()
         {
-            return "<span class=\"genesys dice boost\">j</span>";
+            return "b";
         }
     }
     public class Setback : Dice
@@ -171,7 +221,7 @@ namespace GenesysVTT
 
         public override string ToSymbolString()
         {
-            return "<span class=\"genesys dice setback\">j</span>";
+            return "s";
         }
     }
     public class Ability : Dice
@@ -194,7 +244,7 @@ namespace GenesysVTT
 
         public override string ToSymbolString()
         {
-            return "<span class=\"genesys dice ability\">k</span>";
+            return "a";
         }
     }
     public class Difficulty : Dice
@@ -217,7 +267,7 @@ namespace GenesysVTT
 
         public override string ToSymbolString()
         {
-            return "<span class=\"genesys dice difficulty\">k</span>";
+            return "d";
         }
     }
     public class Proficiency : Dice
@@ -244,7 +294,7 @@ namespace GenesysVTT
 
         public override string ToSymbolString()
         {
-            return "<span class=\"genesys dice proficiency\">l</span>";
+            return "p";
         }
     }
     public class Challenge : Dice
@@ -271,7 +321,7 @@ namespace GenesysVTT
 
         public override string ToSymbolString()
         {
-            return "<span class=\"genesys dice challenge\">l</span>";
+            return "c";
         }
     }
 
